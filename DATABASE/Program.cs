@@ -51,7 +51,10 @@ namespace DATABASE
                     INSERT_VALUES();
                     break;
                 case 5:
-                    INSERT_FEW(); 
+                    INSERT_FEW();
+                    break;
+                case 6:
+                    DELETE();
                     break;
             }
             //while (res != 1 || res != 2)          
@@ -64,7 +67,7 @@ namespace DATABASE
             using (sqn)
             {
                 sqn.Open();
-                
+
                 SqliteCommand command = new SqliteCommand(SELECT_ALL, sqn);
                 SqliteDataReader reader = command.ExecuteReader();
                 string path = @"D:\\guids.txt";
@@ -104,7 +107,7 @@ namespace DATABASE
                                     using (Archive archive = new Archive()) // создаем архив + преобразовать эту функцию в преобразование по GUID*/
                                     {
                                         string zip_path = @"D://database_cr. /*7zip*/ ?";  // 7zip             zip.AddFile(path); //файл для сохранения (последний пункт задания)
-                                        archive.Save(zip_path, new ArchiveSaveOptions  { Encoding = Encoding.ASCII, ArchiveComment = "Добавлен новый файл в архив, guid" }); //Default encoding
+                                        archive.Save(zip_path, new ArchiveSaveOptions { Encoding = Encoding.ASCII, ArchiveComment = "Добавлен новый файл в архив, guid" }); //Default encoding
                                     }
                                 }
                                 Console.WriteLine("{0}", id);
@@ -120,7 +123,7 @@ namespace DATABASE
                             object thirdValue = reader.GetValue(3); //  ---------||---------
                             Console.WriteLine("{0}\t{1}\t{2}\t{3}", id, firstValue, secondValue, thirdValue); // выводим чисто в информативных целях 
                         }
-                    } 
+                    }
                     reader.Close();
                 }
                 Console.Read();
@@ -143,7 +146,7 @@ namespace DATABASE
                 CMD.Connection = sqn;
                 CMD.CommandText = "CREATE TABLE Users(_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, Name TEXT NOT NULL, Age INTEGER NOT NULL, Value INTEGER NOT NULL)";
                 CMD.ExecuteNonQuery();
-                if(CMD.CommandText.Substring(13,18) == "Users")
+                if (CMD.CommandText.Substring(13, 18) == "Users")
                 {
                     Console.WriteLine("Table already exists");
                 }
@@ -193,25 +196,39 @@ namespace DATABASE
                     Dialogs d = new Dialogs();
                     Console.WriteLine(d.err);
                 }
-                
+
             }
             Console.Read();
         }
+
         private void UPDATE()
         {
-        int Age = Convert.ToInt32(Console.ReadLine());
-        string Name = Console.ReadLine();
-        UPD = $"UPDATE Users SET Age={Age} WHERE Name={Name}";
+            int Age = Convert.ToInt32(Console.ReadLine());
+            string Name = Console.ReadLine();
+            UPD = $"UPDATE Users SET Age={Age} WHERE Name={Name}";
             using (SQN)
             {
                 sqn.Open();
-                SqliteCommand cmd = new SqliteCommand(UPD, SQN);   
+                SqliteCommand cmd = new SqliteCommand(UPD, SQN);
                 int number = cmd.ExecuteNonQuery();
                 Console.WriteLine($"Обновлено объектов: {number}");
             }
             Console.Read();
         }
 
+        private static void DELETE() // delete manually row/column ## DELETE FROM таблица WHERE столбец = значение
+        {
+            string Name = Console.ReadLine();
+            string DEL = $"DELETE FROM Users WHERE Name = {Name}";
+            using (SQN)
+            {
+                sqn.Open();
+                SqliteCommand cmd = new SqliteCommand(DEL, SQN);
+                int number = cmd.ExecuteNonQuery();
+                Console.WriteLine($"Удалено объектов: {number}");
+            }
+            Console.Read();
+        }
         public static void DataTable_Name()
         {
             List<string> tables = new List<string>();
@@ -234,11 +251,10 @@ namespace DATABASE
                 }
                 catch (SqliteException) //13 -24
                 {
-                    Console.WriteLine($"No such table {SELECT_ALL.Substring(13, SELECT_ALL.Length-1)} exists");
+                    Console.WriteLine($"No such table {SELECT_ALL.Substring(13, SELECT_ALL.Length - 1)} exists");
                 }
             }
         }
-        
     }
 }
 
@@ -246,12 +262,6 @@ namespace DATABASE
    элемент значение, с guid, и затем записать рез в файл, ЛИБО сразу преобразовать полученное с гуида в массив, вывести построчно, 
    поприсваивать значения, и тоже записать в файл преобразование массива в байтовый, в два шага - бесполезная трата времени 
 */
-
-//for (int c = 0; c < guidArray.Length; c++)
-//{
-//    guidArray[i] = guid;
-//}
-//byte[] guidArray_new = guidArray; <= не рабочий вариант 
 
 //  using (Archive archive    = new Archive()) // создаем архив + преобразовать эту функцию в преобразование по GUID*/
 //{

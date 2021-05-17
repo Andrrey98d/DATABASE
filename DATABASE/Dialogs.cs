@@ -8,8 +8,6 @@ namespace DATABASE
 {
     public class Dialogs
     {
-
-
         public string _err;
         public string err
         {
@@ -24,7 +22,7 @@ namespace DATABASE
         }
         public static void ShowMenu()
         {
-            Console.WriteLine("1 - show connection string\n2 - get DB table(-s) name\n3 - create new table\n4 - insert values\n5 - insert few values");
+            Console.WriteLine("1 - show connection string\n2 - get DB table(-s) name\n3 - create new table\n4 - insert values\n5 - insert few values\n6 - Delete row");
         }
 
 
