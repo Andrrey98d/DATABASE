@@ -69,7 +69,7 @@ namespace DATABASE
                 {
                     using (command)
                     {
-                        while (reader.Read()) // счетчик++
+                        while (reader.Read()) // counter++
                         {
                             //int ct = reader.FieldCount;
                             object id = reader[0]; // надо вытянуть с него массив значений guid, и взять файлстримом
@@ -167,6 +167,13 @@ namespace DATABASE
             }
             Console.Read();
 
+        }
+
+        public static void INSERT_FEW()  //INSERT INTO Users (Name, Age) VALUES ('Alice', 32), ('Bob', 28)";
+        {
+            string Name = Console.ReadLine(); ;
+            int Age = Convert.ToInt32(Console.ReadLine());
+            string Exp = $"INSERT INTO Users (Name, Age) VALUES ({Name}, {Age}), ({Name}, {Age})";
         }
         public static void DataTable_Name()
         {
