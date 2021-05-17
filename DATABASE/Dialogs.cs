@@ -10,7 +10,7 @@ namespace DATABASE
     {
         public static void ShowMenu()
         {
-            Console.WriteLine("1 - show connection string\n2 - get DB table(-s) name\n3 - create new table\n4 - insert values");
+            Console.WriteLine("1 - show connection string\n2 - get DB table(-s) name\n3 - create new table\n4 - insert values\n5 - insert few values");
         }
     }
 }

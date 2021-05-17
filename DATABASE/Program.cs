@@ -50,6 +50,9 @@ namespace DATABASE
                 case 4:
                     INSERT_VALUES();
                     break;
+                case 5:
+                    INSERT_FEW();
+                    break;
             }
             //while (res != 1 || res != 2)          
             //{
@@ -174,6 +177,14 @@ namespace DATABASE
             string Name = Console.ReadLine(); ;
             int Age = Convert.ToInt32(Console.ReadLine());
             string Exp = $"INSERT INTO Users (Name, Age) VALUES ({Name}, {Age}), ({Name}, {Age})";
+            using (SQN)
+            {
+                SQN.Open();
+                SqliteCommand cmd = new SqliteCommand(Exp, SQN);
+                int number = cmd.ExecuteNonQuery();
+                Console.WriteLine($"В таблицу Users добавлено объектов: {number}");
+            }
+            Console.Read();
         }
         public static void DataTable_Name()
         {
