@@ -26,7 +26,7 @@ namespace DATABASE
         public static SqliteConnection sqn = new SqliteConnection(CNCT);
         public static SqliteConnection SQN = new SqliteConnection(CNCT);
 
-        //[STAThread] - в случае если используем GUI
+        //[STAThread] - in case if using GUI
 
         public static void Main(string[] args)
         {
