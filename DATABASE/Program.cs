@@ -17,14 +17,14 @@ using Microsoft.Data.Sqlite;
 
 namespace DATABASE
 {
-
     class Program : Dialogs
     {
-        public const string _CONNECT = @"Data Source = desktop - 9mrv6e2;Initial Catalog = itproger; Integrated Security = True"; // <---
+        public const string _CONNECT = @"Data Source = desktop - 9mrv6e2;Initial Catalog = crypto; Integrated Security = True"; // <---
         public static string SELECT_ALL = "SELECT * FROM dbo.Table_1";
         public const string CNCT = "Data Source=usersdata.db";
         public static SqliteConnection sqn = new SqliteConnection(CNCT);
         public static SqliteConnection SQN = new SqliteConnection(CNCT);
+        private string UPD;
 
         //[STAThread] - in case if using GUI
 
@@ -51,7 +51,7 @@ namespace DATABASE
                     INSERT_VALUES();
                     break;
                 case 5:
-                    INSERT_FEW();
+                    INSERT_FEW(); 
                     break;
             }
             //while (res != 1 || res != 2)          
@@ -174,18 +174,44 @@ namespace DATABASE
 
         public static void INSERT_FEW()  //INSERT INTO Users (Name, Age) VALUES ('Alice', 32), ('Bob', 28)";
         {
+            Console.WriteLine("INSERT NAME: ");
             string Name = Console.ReadLine(); ;
+            Console.WriteLine("INSERT AGE: ");
             int Age = Convert.ToInt32(Console.ReadLine());
             string Exp = $"INSERT INTO Users (Name, Age) VALUES ({Name}, {Age}), ({Name}, {Age})";
             using (SQN)
             {
                 SQN.Open();
                 SqliteCommand cmd = new SqliteCommand(Exp, SQN);
-                int number = cmd.ExecuteNonQuery();
-                Console.WriteLine($"В таблицу Users добавлено объектов: {number}");
+                try
+                {
+                    int number = cmd.ExecuteNonQuery();
+                    Console.WriteLine($"В таблицу Users добавлено объектов: {number}");
+                }
+                catch (Microsoft.Data.Sqlite.SqliteException)
+                {
+                    Dialogs d = new Dialogs();
+                    Console.WriteLine(d.err);
+                }
+                
             }
             Console.Read();
         }
+        private void UPDATE()
+        {
+        int Age = Convert.ToInt32(Console.ReadLine());
+        string Name = Console.ReadLine();
+        UPD = $"UPDATE Users SET Age={Age} WHERE Name={Name}";
+            using (SQN)
+            {
+                sqn.Open();
+                SqliteCommand cmd = new SqliteCommand(UPD, SQN);   
+                int number = cmd.ExecuteNonQuery();
+                Console.WriteLine($"Обновлено объектов: {number}");
+            }
+            Console.Read();
+        }
+
         public static void DataTable_Name()
         {
             List<string> tables = new List<string>();
