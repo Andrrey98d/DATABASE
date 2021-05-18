@@ -76,50 +76,38 @@ namespace DATABASE
                             var id = reader.GetValue(0); // надо вытянуть с него массив  значений guid, и подобрать файлстримом
                             foreach (var value in Convert.ToString(id)) {
                                 var COLUMN_ROW = reader.GetString(value);
+                                //_ = dt.AsEnumerable().Select(r => r.Field<int>("id")).ToList();
                                 ID.Add(COLUMN_ROW);
                             }
 
                             string[] ids = ID.ToArray();
-                          
-                            //или же вот так: var id = reader.GetValue(0);
-                            //_ = dt.AsEnumerable().Select(r => r.Field<int>("id")).ToList();
-
-                            Console.WriteLine(id); // проходим консольным выводом 
+                            
+                           
                             for (int i = 0; i > 0; i++)
                             {
-                                Guid guid = reader.GetGuid(i);
-                                byte[] bytes = guid.ToByteArray(); // преобразование напрямую из гуида, пройдясь циклом
-                                FileStream fs = new FileStream(path, FileMode.Append, FileAccess.ReadWrite);
-                                fs.Write(bytes, 0, count: bytes.Length);
+  
+                                //FileStream fs = new FileStream(path, FileMode.Append, FileAccess.ReadWrite);
+                                //fs.Write(ids, 0, count: ids.Length);
 
                                 //Directory.CreateDirectory($"D:\\{}");
                                 using (StreamWriter sw = new StreamWriter(path,
-                                                                          true,
+                                                                          false, // перезапись. True - дозапись
                                                                           Encoding.Default))
                                 {
-                                    sw.WriteLineAsync(Convert.ToChar(bytes.Length));
+                                    sw.WriteLine(ids);
                                 }
                                 using (ZipFile zip = new ZipFile())
                                 {
                                     using (Archive archive = new Archive()) // создаем архив + преобразовать эту функцию в преобразование по GUID*/
                                     {
-                                        string zip_path = @"D://database_cr. /*7zip*/ ?";  // 7zip             zip.AddFile(path); //файл для сохранения (последний пункт задания)
+                                        zip.AddFile(ids.ToString());
+                                        string zip_path = @"D://database_cr.7zip"; 
                                         archive.Save(zip_path, new ArchiveSaveOptions { Encoding = Encoding.ASCII, ArchiveComment = "Добавлен новый файл в архив, guid" }); //Default encoding
                                     }
                                 }
                                 Console.WriteLine("{0}", id);
                             }
-                        }
-                       //Console.WriteLine("{0}\t{1}\t{2}", reader[0], reader.GetName(1), reader.GetName(2), reader.GetName(3), reader.GetName(4), reader.GetName(5));
-
-                        while (reader.Read()) //++
-                        {
-                            object id = reader[0]; // этот столбец мы и выдираем
-                            object firstValue = reader.GetValue(1); // это столбец со значениями (не гуиды)
-                            object secondValue = reader.GetValue(2); // ---------||---------
-                            object thirdValue = reader.GetValue(3); //  ---------||---------
-                            Console.WriteLine("{0}\t{1}\t{2}\t{3}", id, firstValue, secondValue, thirdValue); // выводим чисто в информативных целях 
-                        }
+                        }             
                     }
                     reader.Close();
                 }
