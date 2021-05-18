@@ -25,10 +25,9 @@ namespace DATABASE
         public static SqliteConnection SQN = new SqliteConnection(CNCT);
 
         //[STAThread] - in case if using GUI
-
         public static async void Main(string[] args)
         {
-            Console.WriteLine(CNCT+ "\n");
+            Console.WriteLine(CNCT + "\n");
             ShowMenu();
             int res = Convert.ToInt32(Console.ReadLine());
             switch (res)
@@ -57,11 +56,10 @@ namespace DATABASE
                     DELETE();
                     break;
             }
-           
+
             using (sqn)
             {
                 sqn.Open();
-
                 SqliteCommand command = new SqliteCommand(SEL_ALL, sqn);
                 SqliteDataReader reader = command.ExecuteReader();
                 string path = @"D:\\guids.txt";
@@ -71,21 +69,19 @@ namespace DATABASE
                     {
                         while (await reader.ReadAsync()) // counter++
                         {
-                            List <string> ID = new List<string>();
+                            List<string> ID = new List<string>();
                             //int ct = reader.FieldCount;
                             var id = reader.GetValue(0); // надо вытянуть с него массив  значений guid, и подобрать файлстримом
-                            foreach (var value in Convert.ToString(id)) {
+                            foreach (var value in Convert.ToString(id))
+                            {
                                 var COLUMN_ROW = reader.GetString(value);
                                 //_ = dt.AsEnumerable().Select(r => r.Field<int>("id")).ToList();
                                 ID.Add(COLUMN_ROW);
                             }
-
                             string[] ids = ID.ToArray();
-                            
-                           
+
                             for (int i = 0; i > 0; i++)
                             {
-  
                                 //FileStream fs = new FileStream(path, FileMode.Append, FileAccess.ReadWrite);
                                 //fs.Write(ids, 0, count: ids.Length);
 
@@ -101,19 +97,18 @@ namespace DATABASE
                                     using (Archive archive = new Archive()) // создаем архив + преобразовать эту функцию в преобразование по GUID*/
                                     {
                                         zip.AddFile(ids.ToString());
-                                        string zip_path = @"D://database_cr.7zip"; 
+                                        string zip_path = @"D://database_cr.7zip";
                                         archive.Save(zip_path, new ArchiveSaveOptions { Encoding = Encoding.ASCII, ArchiveComment = "Добавлен новый файл в архив, guid" }); //Default encoding
                                     }
                                 }
                                 Console.WriteLine("{0}", id);
                             }
-                        }             
+                        }
                     }
                     reader.Close();
                 }
                 Console.Read();
             }
-
         }
         public static void Create_NewTable()
         {
@@ -122,7 +117,7 @@ namespace DATABASE
             using (sqn)
             {
                 sqn.Open();
-                SqliteCommand CMD = new SqliteCommand(); 
+                SqliteCommand CMD = new SqliteCommand();
                 CMD.Connection = sqn;
                 CMD.CommandText = "CREATE TABLE Users(_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, Name TEXT NOT NULL, Age INTEGER NOT NULL, Value INTEGER NOT NULL)";
                 CMD.ExecuteNonQuery();
@@ -130,7 +125,6 @@ namespace DATABASE
                 {
                     Console.WriteLine("Table already exists");
                 }
-
                 Console.WriteLine("Таблица Users создана");
             }
             Console.Read();
@@ -148,13 +142,11 @@ namespace DATABASE
                     CommandText = "INSERT INTO Users (Name, Age) VALUES ('Cryptocom', 128)"
                 };
                 int number = CMD.ExecuteNonQuery();
-
                 Console.WriteLine($"В таблицу Users добавлено объектов: {number}");
             }
             Console.Read();
 
         }
-
         public static void INSERT_FEW()  //primer: INSERT INTO Users (Name, Age) VALUES ('Alice', 32), ('Bob', 28)";
         {
             Console.WriteLine("INSERT NAME: ");
@@ -176,11 +168,9 @@ namespace DATABASE
                     Dialogs d = new Dialogs();
                     Console.WriteLine(d.err);
                 }
-
             }
             Console.Read();
         }
-
         private static void UPDATE()
         {
             int Age = Convert.ToInt32(Console.ReadLine());
@@ -195,7 +185,6 @@ namespace DATABASE
             }
             Console.Read();
         }
-
         private static void DELETE() // delete manually row/column ## DELETE FROM таблица WHERE столбец = значение
         {
             string Name = Console.ReadLine();
@@ -219,7 +208,6 @@ namespace DATABASE
                 {
                     using (SqliteCommand com = new SqliteCommand("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES", con))
                     {
-
                         using (SqliteDataReader reader = com.ExecuteReader())
                         {
                             while (reader.Read())
