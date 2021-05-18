@@ -5,8 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.SqlServer;
 using Microsoft.SqlServer.Server;
-//using System.Data.Sql;
-//using System.Data.SqlClient;
 using System.Data.Common;
 using System.IO;
 using Aspose.Zip;
@@ -21,31 +19,33 @@ namespace DATABASE
     {
         public const string _CONNECT = @"Data Source = desktop - 9mrv6e2;Initial Catalog = crypto; Integrated Security = True"; // <---
         public static string SELECT_ALL = "SELECT * FROM dbo.Table_1";
-        public const string CNCT = "Data Source=usersdata.db";
+        public static string SEL_ALL = "SELECT * FROM Users";
+        public const string CNCT = "Data Source = usersdata.db";
         public static SqliteConnection sqn = new SqliteConnection(CNCT);
         public static SqliteConnection SQN = new SqliteConnection(CNCT);
-        private string UPD;
 
         //[STAThread] - in case if using GUI
 
-        public static void Main(string[] args)
+        public static async void Main(string[] args)
         {
+            Console.WriteLine(CNCT+ "\n");
             ShowMenu();
             int res = Convert.ToInt32(Console.ReadLine());
             switch (res)
             {
+                /*Во всех случаях меняется только sql-выражение*/
                 case 1:
-                    Show_Connection_Line();
-                    break;
-                case 2:
                     for (int i = 0; i <= 2; i++)
                     {
                         Console.Write(".");
                     }
                     DataTable_Name();
                     break;
-                case 3:
+                case 2:
                     Create_NewTable();
+                    break;
+                case 3:
+                    UPDATE();
                     break;
                 case 4:
                     INSERT_VALUES();
@@ -57,37 +57,34 @@ namespace DATABASE
                     DELETE();
                     break;
             }
-            //while (res != 1 || res != 2)          
-            //{
-            //    Console.WriteLine("Type 1 or 2...  ");
-            //    Console.ReadLine();
-            //}
-
-            //SqlConnection connection = new SqlConnection(connectionString);
+           
             using (sqn)
             {
                 sqn.Open();
 
-                SqliteCommand command = new SqliteCommand(SELECT_ALL, sqn);
+                SqliteCommand command = new SqliteCommand(SEL_ALL, sqn);
                 SqliteDataReader reader = command.ExecuteReader();
                 string path = @"D:\\guids.txt";
                 if (reader.HasRows)
                 {
                     using (command)
                     {
-                        while (reader.Read()) // counter++
+                        while (await reader.ReadAsync()) // counter++
                         {
+                            List <string> ID = new List<string>();
                             //int ct = reader.FieldCount;
-                            object id = reader[0]; // надо вытянуть с него массив значений guid, и взять файлстримом
-                            /*
-                            foreach(var i in id) { 
-                            Console.WriteLine(i);
+                            var id = reader.GetValue(0); // надо вытянуть с него массив  значений guid, и подобрать файлстримом
+                            foreach (var value in Convert.ToString(id)) {
+                                var COLUMN_ROW = reader.GetString(value);
+                                ID.Add(COLUMN_ROW);
                             }
-                            */
+
+                            string[] ids = ID.ToArray();
+                          
+                            //или же вот так: var id = reader.GetValue(0);
+                            //_ = dt.AsEnumerable().Select(r => r.Field<int>("id")).ToList();
+
                             Console.WriteLine(id); // проходим консольным выводом 
-
-                            //foreach(guid g in id)    
-
                             for (int i = 0; i > 0; i++)
                             {
                                 Guid guid = reader.GetGuid(i);
@@ -113,7 +110,7 @@ namespace DATABASE
                                 Console.WriteLine("{0}", id);
                             }
                         }
-                        Console.WriteLine("{0}\t{1}\t{2}", reader[0], reader.GetName(1), reader.GetName(2), reader.GetName(3), reader.GetName(4), reader.GetName(5));
+                       //Console.WriteLine("{0}\t{1}\t{2}", reader[0], reader.GetName(1), reader.GetName(2), reader.GetName(3), reader.GetName(4), reader.GetName(5));
 
                         while (reader.Read()) //++
                         {
@@ -130,11 +127,6 @@ namespace DATABASE
             }
 
         }
-        public static void Show_Connection_Line()
-        {
-            Console.WriteLine(CNCT);
-        }
-
         public static void Create_NewTable()
         {
             //users.db лежит  в src/*proj name*/bin/debug
@@ -142,11 +134,11 @@ namespace DATABASE
             using (sqn)
             {
                 sqn.Open();
-                SqliteCommand CMD = new SqliteCommand(); //13-17 ili 13-18
+                SqliteCommand CMD = new SqliteCommand(); 
                 CMD.Connection = sqn;
                 CMD.CommandText = "CREATE TABLE Users(_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, Name TEXT NOT NULL, Age INTEGER NOT NULL, Value INTEGER NOT NULL)";
                 CMD.ExecuteNonQuery();
-                if (CMD.CommandText.Substring(13, 18) == "Users")
+                if (CMD.CommandText.Substring(13, 18) == "Users") //13-17 ili 13-18
                 {
                     Console.WriteLine("Table already exists");
                 }
@@ -158,7 +150,7 @@ namespace DATABASE
 
         public static void INSERT_VALUES()
         {
-            // добавить ридер по столбцам, прировняв его к переменной (var => reader[0])
+            // добавить ридер по столбцам, прирaвняв его к переменной (var => reader[0])
             using (SQN)
             {
                 SQN.Open();
@@ -175,7 +167,7 @@ namespace DATABASE
 
         }
 
-        public static void INSERT_FEW()  //INSERT INTO Users (Name, Age) VALUES ('Alice', 32), ('Bob', 28)";
+        public static void INSERT_FEW()  //primer: INSERT INTO Users (Name, Age) VALUES ('Alice', 32), ('Bob', 28)";
         {
             Console.WriteLine("INSERT NAME: ");
             string Name = Console.ReadLine(); ;
@@ -191,7 +183,7 @@ namespace DATABASE
                     int number = cmd.ExecuteNonQuery();
                     Console.WriteLine($"В таблицу Users добавлено объектов: {number}");
                 }
-                catch (Microsoft.Data.Sqlite.SqliteException)
+                catch (SqliteException)
                 {
                     Dialogs d = new Dialogs();
                     Console.WriteLine(d.err);
@@ -201,11 +193,11 @@ namespace DATABASE
             Console.Read();
         }
 
-        private void UPDATE()
+        private static void UPDATE()
         {
             int Age = Convert.ToInt32(Console.ReadLine());
             string Name = Console.ReadLine();
-            UPD = $"UPDATE Users SET Age={Age} WHERE Name={Name}";
+            string UPD = $"UPDATE Users SET Age={Age} WHERE Name={Name}";
             using (SQN)
             {
                 sqn.Open();
@@ -251,7 +243,7 @@ namespace DATABASE
                 }
                 catch (SqliteException) //13 -24
                 {
-                    Console.WriteLine($"No such table {SELECT_ALL.Substring(13, SELECT_ALL.Length - 1)} exists");
+                    Console.WriteLine($"No such table exists");
                 }
             }
         }
@@ -262,7 +254,7 @@ namespace DATABASE
    элемент значение, с guid, и затем записать рез в файл, ЛИБО сразу преобразовать полученное с гуида в массив, вывести построчно, 
    поприсваивать значения, и тоже записать в файл преобразование массива в байтовый, в два шага - бесполезная трата времени 
 */
-
+//{ SELECT_ALL.Substring(13, SELECT_ALL.Length - 2)}
 //  using (Archive archive    = new Archive()) // создаем архив + преобразовать эту функцию в преобразование по GUID*/
 //{
 //    zip.Password = MyPassword; //генерируем пароль по тыку кнопки создания архива
