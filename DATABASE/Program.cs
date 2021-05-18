@@ -97,14 +97,14 @@ namespace DATABASE
                                     using (Archive archive = new Archive()) // создаем архив + преобразовать эту функцию в преобразование по GUID*/
                                     {
                                         zip.AddFile(ids.ToString());
-                                        string zip_path = @"D://database_cr.7zip";
-                                        archive.Save(zip_path, new ArchiveSaveOptions { Encoding = Encoding.ASCII, ArchiveComment = "Добавлен новый файл в архив, guid" }); //Default encoding
+                                        string zip_path = @"D://database_crypted.7z";
+                                        archive.Save(zip_path, new ArchiveSaveOptions { Encoding = Encoding.ASCII,   = "Добавлен новый файл в архив, guid"}); // or Encoding
                                     }
                                 }
                                 Console.WriteLine("{0}", id);
                             }
                         }
-                    }
+                      }
                     reader.Close();
                 }
                 Console.Read();
@@ -231,7 +231,7 @@ namespace DATABASE
    поприсваивать значения, и тоже записать в файл преобразование массива в байтовый, в два шага - бесполезная трата времени 
 */
 //{ SELECT_ALL.Substring(13, SELECT_ALL.Length - 2)}
-//  using (Archive archive    = new Archive()) // создаем архив + преобразовать эту функцию в преобразование по GUID*/
+//  using (Archive archive = new Archive()) // создаем архив + преобразовать эту функцию в преобразование по GUID*/
 //{
 //    zip.Password = MyPassword; //генерируем пароль по тыку кнопки создания архива
 //    zip.AddFile(FileName); //файл для сохранения (последний пункт задания)
