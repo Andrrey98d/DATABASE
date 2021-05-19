@@ -21,6 +21,7 @@ namespace DATABASE
         public static string SELECT_ALL = "SELECT * FROM dbo.Table_1";
         public static string SEL_ALL = "SELECT * FROM Users";
         public const string CNCT = "Data Source = usersdata.db";
+        public const string ALL_TABLES = ".tables"; // list all tables in database 
         public static SqliteConnection sqn = new SqliteConnection(CNCT);
         public static SqliteConnection SQN = new SqliteConnection(CNCT);
 
@@ -61,50 +62,54 @@ namespace DATABASE
             {
                 sqn.Open();
                 SqliteCommand command = new SqliteCommand(SEL_ALL, sqn);
+                SqliteCommand slc = new SqliteCommand(ALL_TABLES, sqn);
                 SqliteDataReader reader = command.ExecuteReader();
                 string path = @"D:\\guids.txt";
                 if (reader.HasRows)
                 {
-                    using (command)
+                    using (slc)
                     {
-                        while (await reader.ReadAsync()) // counter++
+                        using (command)
                         {
-                            List<string> ID = new List<string>();
-                            //int ct = reader.FieldCount;
-                            var id = reader.GetValue(0); // надо вытянуть с него массив  значений guid, и подобрать файлстримом
-                            foreach (var value in Convert.ToString(id))
+                            while (await reader.ReadAsync()) // counter++
                             {
-                                var COLUMN_ROW = reader.GetString(value);
-                                //_ = dt.AsEnumerable().Select(r => r.Field<int>("id")).ToList();
-                                ID.Add(COLUMN_ROW);
-                            }
-                            string[] ids = ID.ToArray();
-
-                            for (int i = 0; i > 0; i++)
-                            {
-                                //FileStream fs = new FileStream(path, FileMode.Append, FileAccess.ReadWrite);
-                                //fs.Write(ids, 0, count: ids.Length);
-
-                                //Directory.CreateDirectory($"D:\\{}");
-                                using (StreamWriter sw = new StreamWriter(path,
-                                                                          false, // перезапись. True - дозапись
-                                                                          Encoding.Default))
+                                List<string> ID = new List<string>();
+                                var id = reader.GetValue(0); // надо вытянуть с него массив  значений guid, и подобрать файлстримом
+                                                             //впихнуть считку всех таблиц в бд
+                                foreach (var value in Convert.ToString(id))
                                 {
-                                    sw.WriteLine(ids);
+                                    var COLUMN_ROW = reader.GetString(value);
+                                    //_ = dt.AsEnumerable().Select(r => r.Field<int>("id")).ToList();
+                                    ID.Add(COLUMN_ROW);
                                 }
-                                using (ZipFile zip = new ZipFile())
+                                string[] ids = ID.ToArray();
+
+                                for (int i = Convert.ToInt32(ids[0]); i > ids.Length; i++)
                                 {
-                                    using (Archive archive = new Archive()) // создаем архив + преобразовать эту функцию в преобразование по GUID*/
+                                    //FileStream fs = new FileStream(path, FileMode.Append, FileAccess.ReadWrite);
+                                    //fs.Write(ids, 0, count: ids.Length);
+
+                                    //Directory.CreateDirectory($"D:\\{}");
+                                    using (StreamWriter sw = new StreamWriter(path,
+                                                                              false, // перезапись. True - дозапись
+                                                                              Encoding.Default))
                                     {
-                                        zip.AddFile(ids.ToString());
-                                        string zip_path = @"D://database_crypted.7z";
-                                        archive.Save(zip_path, new ArchiveSaveOptions { Encoding = Encoding.ASCII,   = "Добавлен новый файл в архив, guid"}); // or Encoding
+                                        sw.WriteLine(ids);
                                     }
+                                    using (ZipFile zip = new ZipFile())
+                                    {
+                                        using (Archive archive = new Archive()) // создаем архив + преобразовать эту функцию в преобразование по GUID*/
+                                        {
+                                            zip.AddFile(ids.ToString());
+                                            string zip_path = @"D://database_crypted.7z";
+                                            archive.Save(zip_path, new ArchiveSaveOptions { Encoding = Encoding.ASCII, ArchiveComment = "Добавлен новый файл в архив, guid" }); // or Encoding
+                                        }
+                                    }
+                                    Console.WriteLine("{0}", id);
                                 }
-                                Console.WriteLine("{0}", id);
                             }
                         }
-                      }
+                    }
                     reader.Close();
                 }
                 Console.Read();
@@ -121,7 +126,7 @@ namespace DATABASE
                 CMD.Connection = sqn;
                 CMD.CommandText = "CREATE TABLE Users(_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, Name TEXT NOT NULL, Age INTEGER NOT NULL, Value INTEGER NOT NULL)";
                 CMD.ExecuteNonQuery();
-                if (CMD.CommandText.Substring(13, 18) == "Users") //13-17 ili 13-18
+                if (CMD.CommandText.Substring(13, 18) == "Users") //index => 13-17 or 13-18 
                 {
                     Console.WriteLine("Table already exists");
                 }
