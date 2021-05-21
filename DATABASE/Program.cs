@@ -73,9 +73,24 @@ namespace DATABASE
                         {
                             while (await reader.ReadAsync()) // counter++
                             {
+                                string text = "";
+                                string[] words = text.Split(' ');
+                                string w1 = words[0];
+                                string w2 = words[1];
+                                string w3 = words[2];
+
                                 List<string> ID = new List<string>();
-                                var id = reader.GetValue(0); // надо вытянуть с него массив  значений guid, и подобрать файлстримом
-                                                             //впихнуть считку всех таблиц в бд
+                                var id = reader.GetValue(0);
+                                object[] objs = new object[1]; // 1,2,3,  и т.д
+                                var column_val = reader.GetValues(objs); // берем все значения столбцов с второй строки 
+                                var column_values = column_val.ToString();
+                                string result_ = "";
+
+                                foreach (var id_ in column_values)
+                                {
+                                    result_ += id_ + "\n"; // можно разобрать массив и через сплит, но не суть
+                                }
+
                                 foreach (var value in Convert.ToString(id))
                                 {
                                     var COLUMN_ROW = reader.GetString(value);
@@ -83,13 +98,13 @@ namespace DATABASE
                                     ID.Add(COLUMN_ROW);
                                 }
                                 string[] ids = ID.ToArray();
-
-                                for (int i = Convert.ToInt32(ids[0]); i > ids.Length; i++)
+                                for (int i = 0; i > ids.Length; i++)
                                 {
+                                    //ids[0]
                                     //FileStream fs = new FileStream(path, FileMode.Append, FileAccess.ReadWrite);
                                     //fs.Write(ids, 0, count: ids.Length);
 
-                                    //Directory.CreateDirectory($"D:\\{}");
+                                        //Directory.CreateDirectory($"D:\\{}");
                                     using (StreamWriter sw = new StreamWriter(path,
                                                                               false, // перезапись. True - дозапись
                                                                               Encoding.Default))
@@ -101,12 +116,15 @@ namespace DATABASE
                                         using (Archive archive = new Archive()) // создаем архив + преобразовать эту функцию в преобразование по GUID*/
                                         {
                                             zip.AddFile(ids.ToString());
-                                            string zip_path = @"D://database_crypted.7z";
-                                            archive.Save(zip_path, new ArchiveSaveOptions { Encoding = Encoding.ASCII, ArchiveComment = "Добавлен новый файл в архив, guid" }); // or Encoding
+                                            string zip_path = @"D://d.7z";
+                                            archive.Save(zip_path, new ArchiveSaveOptions { Encoding = Encoding.ASCII, ArchiveComment = result_ }); // or Encoding
+                                            //"Добавлен новый файл в архив, guid"
                                         }
                                     }
                                     Console.WriteLine("{0}", id);
                                 }
+                                
+                              
                             }
                         }
                     }
@@ -115,7 +133,11 @@ namespace DATABASE
                 Console.Read();
             }
         }
-        public static void Create_NewTable()
+
+       
+
+
+    public static void Create_NewTable()
         {
             //users.db лежит  в src/*proj name*/bin/debug
             var sqn = new SqliteConnection(CNCT);

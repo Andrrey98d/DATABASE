@@ -31,7 +31,7 @@ namespace DATABASE
                 {
                     using (command)
                     { 
-                        while (reader_.Read())
+                        while (reader_.Read()) 
                         {
                             _ = reader_[0]; // guids
                                             
