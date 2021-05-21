@@ -12,7 +12,7 @@ using Aspose.Zip.Saving;
 using Aspose.Zip.SevenZip;
 using Ionic.Zip;
 using Microsoft.Data.Sqlite;
-
+using System.Windows.Forms;
 namespace DATABASE
 {
     class Program : Dialogs
@@ -25,9 +25,12 @@ namespace DATABASE
         public static SqliteConnection sqn = new SqliteConnection(CNCT);
         public static SqliteConnection SQN = new SqliteConnection(CNCT);
 
-        //[STAThread] - in case if using GUI
+        [STAThread] // in case if using GUI
         public static async void Main(string[] args)
         {
+            OpenFileDialog ofd = new OpenFileDialog();
+            SaveFileDialog sfd = new SaveFileDialog();
+
             Console.WriteLine(CNCT + "\n");
             ShowMenu();
             int res = Convert.ToInt32(Console.ReadLine());
@@ -64,7 +67,7 @@ namespace DATABASE
                 SqliteCommand command = new SqliteCommand(SEL_ALL, sqn);
                 SqliteCommand slc = new SqliteCommand(ALL_TABLES, sqn);
                 SqliteDataReader reader = command.ExecuteReader();
-                string path = @"D:\\guids.txt";
+                string path = @"D:\\file.dta";
                 if (reader.HasRows)
                 {
                     using (slc)
@@ -80,6 +83,7 @@ namespace DATABASE
                                 string w3 = words[2];
 
                                 List<string> ID = new List<string>();
+
                                 var id = reader.GetValue(0);
                                 object[] objs = new object[1]; // 1,2,3,  и т.д
                                 var column_val = reader.GetValues(objs); // берем все значения столбцов с второй строки 
@@ -95,7 +99,7 @@ namespace DATABASE
                                 {
                                     var COLUMN_ROW = reader.GetString(value);
                                     //_ = dt.AsEnumerable().Select(r => r.Field<int>("id")).ToList();
-                                    ID.Add(COLUMN_ROW);
+                                    ID.Add(COLUMN_ROW); // заносим в лист наши значения со столбца [0]
                                 }
                                 string[] ids = ID.ToArray();
                                 for (int i = 0; i > ids.Length; i++)
@@ -115,10 +119,21 @@ namespace DATABASE
                                     {
                                         using (Archive archive = new Archive()) // создаем архив + преобразовать эту функцию в преобразование по GUID*/
                                         {
+                                            if (sfd.ShowDialog() == DialogResult.Cancel)
+                                            {
+                                                return;
+                                            }
+                                            string FileName = sfd.FileName;
                                             zip.AddFile(ids.ToString());
-                                            string zip_path = @"D://d.7z";
+                                            string zip_path = @"D://" + FileName + ".7z"; // сюда вместо элемента листа [0] можно впихнуть чето типо "selected button" <= wf
                                             archive.Save(zip_path, new ArchiveSaveOptions { Encoding = Encoding.ASCII, ArchiveComment = result_ }); // or Encoding
+
                                             //"Добавлен новый файл в архив, guid"
+                                            //один архив - один гуид(вся строка, привязанная к нему), в нем будут лежать еще файлы (dta или другие)
+                                            //соответственно, в папке будут лежать n архивов = n строк(гуидов). 7 гуидов(или строк) => 7 архивов и т.д
+                                            // и соответственно, количество таблиц = количество папок, в которых буду лежать архивы с гуидами. 7 таблиц(tables) = 7 папок
+                                            // path для папок = название таблицы
+                                            //path для архивов = файловая херня (там будет столбец с названиями, типо type_material и т.д), вот их и вбивать в путь, перед 
                                         }
                                     }
                                     Console.WriteLine("{0}", id);
@@ -133,10 +148,6 @@ namespace DATABASE
                 Console.Read();
             }
         }
-
-       
-
-
     public static void Create_NewTable()
         {
             //users.db лежит  в src/*proj name*/bin/debug
@@ -156,7 +167,6 @@ namespace DATABASE
             }
             Console.Read();
         }
-
         public static void INSERT_VALUES()
         {
             // добавить ридер по столбцам, прирaвняв его к переменной (var => reader[0])
@@ -172,7 +182,6 @@ namespace DATABASE
                 Console.WriteLine($"В таблицу Users добавлено объектов: {number}");
             }
             Console.Read();
-
         }
         public static void INSERT_FEW()  //primer: INSERT INTO Users (Name, Age) VALUES ('Alice', 32), ('Bob', 28)";
         {

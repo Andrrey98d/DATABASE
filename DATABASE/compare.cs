@@ -14,17 +14,16 @@ namespace DATABASE
     class compare: Program
     {
 
-        public string ConString = _CONNECT;
-        public string SQLCommand = SELECT_ALL;
+        public static string ConString = _CONNECT;
+        public static string SQLCommand = SELECT_ALL;
 
-        public void Initialize_DB(string Constring, string Exp)
+        public static SqliteConnection connection = new SqliteConnection(ConString);
+        public static SqliteCommand command = new SqliteCommand(SQLCommand, connection);
+        public static SqliteDataReader reader_ = command.ExecuteReader();
+
+        public static void Initialize_DB()
         {
-            this.ConString = Constring;
-            SqliteConnection connection = new SqliteConnection(Constring);
-            this.SQLCommand = Exp;
-            SqliteCommand command = new SqliteCommand(Exp, connection);
-            SqliteDataReader reader_ = command.ExecuteReader();
-            using (connection)
+   using (connection)
             {
                 connection.Open();
                 if (reader_.HasRows)
