@@ -13,6 +13,7 @@ using Aspose.Zip.SevenZip;
 using Ionic.Zip;
 using Microsoft.Data.Sqlite;
 using System.Windows.Forms;
+
 namespace DATABASE
 {
     class Program : Dialogs
@@ -21,12 +22,12 @@ namespace DATABASE
         public static string SELECT_ALL = "SELECT * FROM dbo.Table_1";
         public static string SEL_ALL = "SELECT * FROM Users";
         public const string CNCT = "Data Source = usersdata.db";
-        public const string ALL_TABLES = ".tables"; // list all tables in database 
+        public const string ALL_TABLES = ". tables"; // list all tables in database 
         public static SqliteConnection sqn = new SqliteConnection(CNCT);
         public static SqliteConnection SQN = new SqliteConnection(CNCT);
 
         [STAThread] // in case if using GUI
-        public static async void Main(string[] args)
+        public static void Main(string [] args)
         {
             OpenFileDialog ofd = new OpenFileDialog();
             SaveFileDialog sfd = new SaveFileDialog();
@@ -74,7 +75,7 @@ namespace DATABASE
                     {
                         using (command)
                         {
-                            while (await reader.ReadAsync()) // counter++
+                            while (reader.Read()) // counter++ => // removed await method to avoid non-recognising point of entry (Main)
                             {
                                 string text = "";
                                 string[] words = text.Split(' ');
@@ -97,7 +98,7 @@ namespace DATABASE
 
                                 foreach (var value in Convert.ToString(id))
                                 {
-                                    var COLUMN_ROW = reader.GetString(value);
+                                    var COLUMN_ROW = reader.GetString(value);  
                                     //_ = dt.AsEnumerable().Select(r => r.Field<int>("id")).ToList();
                                     ID.Add(COLUMN_ROW); // заносим в лист наши значения со столбца [0]
                                 }
@@ -125,7 +126,8 @@ namespace DATABASE
                                             }
                                             string FileName = sfd.FileName;
                                             zip.AddFile(ids.ToString());
-                                            string zip_path = @"D://" + FileName + ".7z"; // сюда вместо элемента листа [0] можно впихнуть чето типо "selected button" <= wf
+                                            DataTable_Name();
+                                            string zip_path = @"D://" + /*datatable.name*/ (FileName) + ".7z"; // сюда вместо элемента листа [0] можно впихнуть чето типо "selected button" <= wf
                                             archive.Save(zip_path, new ArchiveSaveOptions { Encoding = Encoding.ASCII, ArchiveComment = result_ }); // or Encoding
 
                                             //"Добавлен новый файл в архив, guid"
@@ -167,7 +169,7 @@ namespace DATABASE
             }
             Console.Read();
         }
-        public static void INSERT_VALUES()
+    public static void INSERT_VALUES()
         {
             // добавить ридер по столбцам, прирaвняв его к переменной (var => reader[0])
             using (SQN)
@@ -183,7 +185,7 @@ namespace DATABASE
             }
             Console.Read();
         }
-        public static void INSERT_FEW()  //primer: INSERT INTO Users (Name, Age) VALUES ('Alice', 32), ('Bob', 28)";
+    public static void INSERT_FEW()  //primer: INSERT INTO Users (Name, Age) VALUES ('Alice', 32), ('Bob', 28)";
         {
             Console.WriteLine("INSERT NAME: ");
             string Name = Console.ReadLine(); ;
@@ -257,7 +259,23 @@ namespace DATABASE
                 {
                     Console.WriteLine($"No such table exists");
                 }
+                return;
             }
+        }
+
+        public override string ToString()
+        {
+            return base.ToString();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }

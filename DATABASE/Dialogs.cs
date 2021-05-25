@@ -20,6 +20,10 @@ namespace DATABASE
                 _err = "Error, no such column exists.";
             }
         }
+        //public static void Main()
+        //{
+        //    ShowMenu();
+        //}
         public static void ShowMenu()
         {
             Console.WriteLine("1 - get DB table(-s) name\n2 - create new table\n3 - update table\n4 - insert values\n5 - insert few values\n6 - delete row");
