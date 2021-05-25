@@ -31,8 +31,6 @@ namespace DATABASE
         [STAThread] // in case if using GUI
         public static void Main(string [] args)
         {
-          
-
             Console.WriteLine(CNCT + "\n");
             Task task_con = new Task(Initialize_Connection);
             task_con.Start();
@@ -64,10 +62,7 @@ namespace DATABASE
                         DELETE();
                         break;
                 }
-            
-
         }
-
         public static void Initialize_Connection()
         {
             using (sqn)
@@ -100,7 +95,7 @@ namespace DATABASE
                                 List<string> ID = new List<string>();
                                 var id = reader.GetValue(0);
                                 object[] objs = new object[1]; //1,2,3,  и т.д
-                                //string[] strSummCities = dtTemp1.AsEnumerable().Select(s => s.Field<string>("City")).ToArray<string>(); //где dtTemp1 - экзмепляр datatable
+                                //string[] column1_values = dtTemp1.AsEnumerable().Select(s => s.Field<string>("City")).ToArray<string>(); //где dtTemp1 - экзмепляр datatable
                                 var column_val = reader.GetValues(objs); //берем все значения столбцов с второй строки 
                                 var column_values = column_val.ToString();
                                 string result_ = "";
