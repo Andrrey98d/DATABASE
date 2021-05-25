@@ -18,50 +18,58 @@ namespace DATABASE
 {
     class Program : Dialogs
     {
-        public const string _CONNECT = @"Data Source = desktop - 9mrv6e2;Initial Catalog = crypto; Integrated Security = True"; // <---
+        public const string _CONNECT = @"Data Source = desktop - 9mrv6e2;Initial Catalog = crypto; Integrated Security = True"; //unnecessary
         public static string SELECT_ALL = "SELECT * FROM dbo.Table_1";
         public static string SEL_ALL = "SELECT * FROM Users";
         public const string CNCT = "Data Source = usersdata.db";
-        public const string ALL_TABLES = ". tables"; // list all tables in database 
+        public const string ALL_TABLES = ". tables"; //list all tables in database 
         public static SqliteConnection sqn = new SqliteConnection(CNCT);
         public static SqliteConnection SQN = new SqliteConnection(CNCT);
+        public static OpenFileDialog ofd = new OpenFileDialog();
+        public static SaveFileDialog sfd = new SaveFileDialog();
 
         [STAThread] // in case if using GUI
         public static void Main(string [] args)
         {
-            OpenFileDialog ofd = new OpenFileDialog();
-            SaveFileDialog sfd = new SaveFileDialog();
+          
 
             Console.WriteLine(CNCT + "\n");
+            Task task_con = new Task(Initialize_Connection);
+            task_con.Start();
             ShowMenu();
             int res = Convert.ToInt32(Console.ReadLine());
-            switch (res)
-            {
-                /*Во всех случаях меняется только sql-выражение*/
-                case 1:
-                    for (int i = 0; i <= 2; i++)
-                    {
-                        Console.Write(".");
-                    }
-                    DataTable_Name();
-                    break;
-                case 2:
-                    Create_NewTable();
-                    break;
-                case 3:
-                    UPDATE();
-                    break;
-                case 4:
-                    INSERT_VALUES();
-                    break;
-                case 5:
-                    INSERT_FEW();
-                    break;
-                case 6:
-                    DELETE();
-                    break;
-            }
+                switch (res)
+                {
+                    /*Во всех случаях меняется только sql-выражение*/
+                    case 1:
+                        for (int i = 0; i <= 2; i++)
+                        {
+                            Console.Write(".");
+                        }
+                        DataTable_Name();
+                        break;
+                    case 2:
+                        Create_NewTable();
+                        break;
+                    case 3:
+                        UPDATE();
+                        break;
+                    case 4:
+                        INSERT_VALUES();
+                        break;
+                    case 5:
+                        INSERT_FEW();
+                        break;
+                    case 6:
+                        DELETE();
+                        break;
+                }
+            
 
+        }
+
+        public static void Initialize_Connection()
+        {
             using (sqn)
             {
                 sqn.Open();
@@ -75,50 +83,48 @@ namespace DATABASE
                     {
                         using (command)
                         {
-                            while (reader.Read()) // counter++ => // removed await method to avoid non-recognising point of entry (Main)
+                            while (reader.Read()) //counter++ => removed await method to avoid non-recognising point of entry (Main)
                             {
                                 string text = "";
                                 string[] words = text.Split(' ');
-                                string w1 = words[0];
-                                string w2 = words[1];
-                                string w3 = words[2];
-
+                                try
+                                {
+                                    string w1 = words[0];
+                                    string w2 = words[1];
+                                    string w3 = words[2];
+                                }
+                                catch (IndexOutOfRangeException)
+                                {
+                                    Console.WriteLine("Index was out of range.");
+                                }
                                 List<string> ID = new List<string>();
-
                                 var id = reader.GetValue(0);
-                                object[] objs = new object[1]; // 1,2,3,  и т.д
-                                var column_val = reader.GetValues(objs); // берем все значения столбцов с второй строки 
+                                object[] objs = new object[1]; //1,2,3,  и т.д
+                                //string[] strSummCities = dtTemp1.AsEnumerable().Select(s => s.Field<string>("City")).ToArray<string>(); //где dtTemp1 - экзмепляр datatable
+                                var column_val = reader.GetValues(objs); //берем все значения столбцов с второй строки 
                                 var column_values = column_val.ToString();
                                 string result_ = "";
 
                                 foreach (var id_ in column_values)
                                 {
-                                    result_ += id_ + "\n"; // можно разобрать массив и через сплит, но не суть
+                                    result_ += id_ + "\n"; //можно разобрать массив и через сплит, но не суть
                                 }
-
                                 foreach (var value in Convert.ToString(id))
                                 {
-                                    var COLUMN_ROW = reader.GetString(value);  
+                                    var COLUMN_ROW = reader.GetString(value);
                                     //_ = dt.AsEnumerable().Select(r => r.Field<int>("id")).ToList();
                                     ID.Add(COLUMN_ROW); // заносим в лист наши значения со столбца [0]
                                 }
                                 string[] ids = ID.ToArray();
                                 for (int i = 0; i > ids.Length; i++)
                                 {
-                                    //ids[0]
-                                    //FileStream fs = new FileStream(path, FileMode.Append, FileAccess.ReadWrite);
-                                    //fs.Write(ids, 0, count: ids.Length);
-
-                                        //Directory.CreateDirectory($"D:\\{}");
-                                    using (StreamWriter sw = new StreamWriter(path,
-                                                                              false, // перезапись. True - дозапись
-                                                                              Encoding.Default))
+                                    using (StreamWriter sw = new StreamWriter(path, false, Encoding.Default)) //перезапись. True - дозапись
                                     {
                                         sw.WriteLine(ids);
                                     }
                                     using (ZipFile zip = new ZipFile())
                                     {
-                                        using (Archive archive = new Archive()) // создаем архив + преобразовать эту функцию в преобразование по GUID*/
+                                        using (Archive archive = new Archive()) //создаем архив + преобразовать эту функцию в преобразование по GUID
                                         {
                                             if (sfd.ShowDialog() == DialogResult.Cancel)
                                             {
@@ -133,15 +139,13 @@ namespace DATABASE
                                             //"Добавлен новый файл в архив, guid"
                                             //один архив - один гуид(вся строка, привязанная к нему), в нем будут лежать еще файлы (dta или другие)
                                             //соответственно, в папке будут лежать n архивов = n строк(гуидов). 7 гуидов(или строк) => 7 архивов и т.д
-                                            // и соответственно, количество таблиц = количество папок, в которых буду лежать архивы с гуидами. 7 таблиц(tables) = 7 папок
-                                            // path для папок = название таблицы
+                                            //и соответственно, количество таблиц = количество папок, в которых буду лежать архивы с гуидами. 7 таблиц(tables) = 7 папок
+                                            //path для папок = название таблицы
                                             //path для архивов = файловая херня (там будет столбец с названиями, типо type_material и т.д), вот их и вбивать в путь, перед 
                                         }
                                     }
                                     Console.WriteLine("{0}", id);
                                 }
-                                
-                              
                             }
                         }
                     }
@@ -157,11 +161,13 @@ namespace DATABASE
             using (sqn)
             {
                 sqn.Open();
-                SqliteCommand CMD = new SqliteCommand();
-                CMD.Connection = sqn;
-                CMD.CommandText = "CREATE TABLE Users(_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, Name TEXT NOT NULL, Age INTEGER NOT NULL, Value INTEGER NOT NULL)";
+                SqliteCommand CMD = new SqliteCommand
+                {
+                    Connection = sqn,
+                    CommandText = "CREATE TABLE Users_3(_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, Nameee TEXT NOT NULL, Age INTEGER NOT NULL, Value INTEGER NOT NULL)"
+                };
                 CMD.ExecuteNonQuery();
-                if (CMD.CommandText.Substring(13, 18) == "Users") //index => 13-17 or 13-18 
+                if (CMD.CommandText.Substring(13, 18) == "Users") //or 13-17
                 {
                     Console.WriteLine("Table already exists");
                 }
@@ -195,7 +201,7 @@ namespace DATABASE
             using (SQN)
             {
                 SQN.Open();
-                SqliteCommand cmd = new SqliteCommand(Exp, SQN);
+                SqliteCommand cmd = new SqliteCommand(Exp, SQN); //13-17 /13-18
                 try
                 {
                     int number = cmd.ExecuteNonQuery();
@@ -223,7 +229,7 @@ namespace DATABASE
             }
             Console.Read();
         }
-        private static void DELETE() // delete manually row/column ## DELETE FROM таблица WHERE столбец = значение
+        private static void DELETE() //delete manually row/column ## DELETE FROM таблица WHERE столбец = значение
         {
             string Name = Console.ReadLine();
             string DEL = $"DELETE FROM Users WHERE Name = {Name}";
@@ -238,7 +244,7 @@ namespace DATABASE
         }
         public static void DataTable_Name()
         {
-            List<string> tables = new List<string>();
+            List <string> tables = new List <string>();
             using (SqliteConnection con = new SqliteConnection(CNCT))
             {
                 con.Open();
@@ -255,14 +261,13 @@ namespace DATABASE
                         }
                     }
                 }
-                catch (SqliteException) //13 -24
+                catch (SqliteException)
                 {
                     Console.WriteLine($"No such table exists");
                 }
                 return;
             }
         }
-
         public override string ToString()
         {
             return base.ToString();
@@ -279,15 +284,3 @@ namespace DATABASE
         }
     }
 }
-
-/* два варианта - либо через guid guid  пройтись в цикле по всем гуидам, создать массив с длиной, занести в цикле в каждый 
-   элемент значение, с guid, и затем записать рез в файл, ЛИБО сразу преобразовать полученное с гуида в массив, вывести построчно, 
-   поприсваивать значения, и тоже записать в файл преобразование массива в байтовый, в два шага - бесполезная трата времени 
-*/
-//{ SELECT_ALL.Substring(13, SELECT_ALL.Length - 2)}
-//  using (Archive archive = new Archive()) // создаем архив + преобразовать эту функцию в преобразование по GUID*/
-//{
-//    zip.Password = MyPassword; //генерируем пароль по тыку кнопки создания архива
-//    zip.AddFile(FileName); //файл для сохранения (последний пункт задания)
-//    archive.Save(Sql_Path, new ArchiveSaveOptions { Encoding = Encoding.ASCII, ArchiveComment = "Добавлен новый файл в архив" });
-//} 
