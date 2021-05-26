@@ -56,9 +56,6 @@ namespace DATABASE
                     INSERT_VALUES();
                     break;
                 case 5:
-                    INSERT_FEW();
-                    break;
-                case 6:
                     DELETE();
                     break;
             }
@@ -90,16 +87,11 @@ namespace DATABASE
                                         Console.Write("\t" + reader[i]);
                                     }
                                     Console.WriteLine("");
-                                    try
-                                    {
-                                        string w1 = words[0];
-                                        string w2 = words[1];
-                                        string w3 = words[2];
-                                    }                                 
-                                    catch (IndexOutOfRangeException)
-                                    {
-                                        Console.WriteLine("Index was out of range.");
-                                    }
+                                  
+                                        //string w1 = words[0]; [0],1,2..3..n
+                                        
+                                                                 
+                                   
                                     List<string> ID = new List<string>();
                                     var id = reader.GetValue(0);
 
@@ -145,34 +137,10 @@ namespace DATABASE
                 SqliteCommand CMD = new SqliteCommand
                 {
                     Connection = SQN,
-                    CommandText = "INSERT INTO Users (Name, Age) VALUES ('Cryptocom', 128)"
+                    CommandText = "INSERT INTO Users (Name, Age) VALUES ('Cryptocommand', 128)"
                 };
                 int number = CMD.ExecuteNonQuery();
                 Console.WriteLine($"В таблицу Users добавлено объектов: {number}");
-            }
-            Console.Read();
-        }
-        public static void INSERT_FEW()  //primer: INSERT INTO Users (Name, Age) VALUES ('Alice', 32), ('Bob', 28)";
-        {
-            Console.WriteLine("INSERT NAME: ");
-            string Name = Console.ReadLine(); ;
-            Console.WriteLine("INSERT AGE: ");
-            int Age = Convert.ToInt32(Console.ReadLine());
-            string Exp = $"INSERT INTO Users (Name, Age) VALUES ({Name}, {Age}), ({Name}, {Age})";
-            using (SQN)
-            {
-                SQN.Open();
-                SqliteCommand cmd = new SqliteCommand(Exp, SQN); //13-17 /13-18
-                try
-                {
-                    int number = cmd.ExecuteNonQuery();
-                    Console.WriteLine($"В таблицу Users добавлено объектов: {number}");
-                }
-                catch (SqliteException)
-                {
-                    Dialogs d = new Dialogs();
-                    Console.WriteLine(d.err);
-                }
             }
             Console.Read();
         }
@@ -192,14 +160,15 @@ namespace DATABASE
         }
         private static void DELETE() //delete manually row/column ## DELETE FROM таблица WHERE столбец = значение
         {
+            Console.WriteLine("Введите имя столбца/строки");
             string Name = Console.ReadLine();
             string DEL = $"DELETE FROM Users WHERE Name = {Name}";
             using (SQN)
             {
-                sqn.Open();
+                SQN.Open();
                 SqliteCommand cmd = new SqliteCommand(DEL, SQN);
-                int number = cmd.ExecuteNonQuery();
-                Console.WriteLine($"Удалено объектов: {number}");
+                //int number = cmd.ExecuteNonQuery();
+                //Console.WriteLine($"Удалено объектов: {number}");
             }
             Console.Read();
         }
