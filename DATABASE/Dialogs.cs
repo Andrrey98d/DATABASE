@@ -26,7 +26,7 @@ namespace DATABASE
         //}
         public static void ShowMenu()
         {
-            Console.WriteLine("1 - get DB table(-s) name\n2 - create new table\n3 - update table\n4 - insert values\n5 - delete row");
+            Console.WriteLine("1 - create new table\n2 - update table\n3 - insert values\n4 - delete row");
         }
     }
 }

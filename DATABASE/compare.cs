@@ -15,7 +15,7 @@ namespace DATABASE
     {
 
         public static string ConString = _CONNECT;
-        public static string SQLCommand = SELECT_ALL;
+        public static string SQLCommand = SEL_ALL;
 
         public static SqliteConnection connection = new SqliteConnection(ConString);
         public static SqliteCommand command = new SqliteCommand(SQLCommand, connection);

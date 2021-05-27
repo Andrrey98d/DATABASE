@@ -19,7 +19,6 @@ namespace DATABASE
     class Program : Dialogs
     {
         public const string _CONNECT = @"Data Source = desktop - 9mrv6e2;Initial Catalog = crypto; Integrated Security = True"; //unnecessary
-        public static string SELECT_ALL = "SELECT * FROM dbo.Table_1";
         public static string SEL_ALL = "SELECT * FROM Users";
         public const string CNCT = "Data Source = usersdata.db";
         public const string ALL_TABLES = ".tables"; //list all tables in database 
@@ -30,34 +29,25 @@ namespace DATABASE
         [STAThread] // in case if using GUI
         public static void Main(string[] args)
         {
-
             Console.WriteLine(CNCT + "\n");
-            Task task_con = new Task(Initialize_Connection);
-            task_con.Start();
+            Task task_con = new Task(Initialize_Connection);       
             ShowMenu();
+            Console.ReadLine();
             int res = Convert.ToInt32(Console.ReadLine());
             switch (res)
             {
-                /*Во всех случаях меняется только sql-выражение*/
-                case 1:
-                    for (int i = 0; i <= 2; i++)
-                    {
-                        Console.Write(".");
-                    }
-                    DataTable_Name();
-                    break;
+               case 1:
+                   Create_NewTable();
+                   break;
                 case 2:
-                    Create_NewTable();
-                    break;
+                   UPDATE();
+                   break;
                 case 3:
-                    UPDATE();
-                    break;
+                   INSERT_VALUES();
+                   break;
                 case 4:
-                    INSERT_VALUES();
-                    break;
-                case 5:
-                    DELETE();
-                    break;
+                   DELETE();
+                   break;
             }
         }
         public static void Initialize_Connection()
@@ -68,7 +58,7 @@ namespace DATABASE
                 SqliteCommand command = new SqliteCommand(SEL_ALL, sqn);
                 SqliteCommand slc = new SqliteCommand(ALL_TABLES, sqn);
                 SqliteDataReader reader = command.ExecuteReader();
-                string path = @"D:\\file.dta";
+                string path = @"D:\\file.txt";
                 if (reader.HasRows)
                 {
                     using (slc)
@@ -77,27 +67,47 @@ namespace DATABASE
                         {
                             while (reader.Read()) //counter++ => removed await method to avoid non-recognising point of entry (Main)
                             {
-                                bool HR = reader.HasRows;
-                                if (HR == true)
+                                bool hasRows = reader.HasRows;
+                                if (hasRows == true)
                                 {
-                                    string text = "";
-                                    string[] words = text.Split(' ');
+                                    List <string> ofValues = new List<string>();
+                                    Console.WriteLine("");
+                                    
                                     for (int i = 0; i < reader.FieldCount; i++)
                                     {
                                         Console.Write("\t" + reader[i]);
+                                        ofValues.Add(reader[i].ToString());
                                     }
                                     Console.WriteLine("");
-                                  
-                                        //string w1 = words[0]; [0],1,2..3..n
-                                        
-                                                                 
-                                   
+                                    string val = "";
+                                    for(int i = 0; i < ofValues.Count; i++)
+                                    {
+                                        val += "\n" + ofValues[i];
+                                    }
+                                    Console.WriteLine("");
+                                    Console.WriteLine("write? y/n");
+                                    string res = Console.ReadLine();
+                                    if (res == "y")
+                                    {
+                                        using (StreamWriter sw = new StreamWriter(path, true, Encoding.Default))
+                                        {
+                                            foreach (var values in ofValues)
+                                            {
+                                                sw.WriteLine(val);         
+                                            }
+                                            sw.Close();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        return;
+                                    }
+                                    //string w1 = words[0]; [0],1,2..3..n
                                     List<string> ID = new List<string>();
                                     var id = reader.GetValue(0);
-
                                     object[] objs = new object[1]; //1,2,3,  и т.д
-                                                                   //string[] column1_values = dtTemp1.AsEnumerable().Select(s => s.Field<string>("City")).ToArray<string>(); //где dtTemp1 - экземпляр datatable
-                                   }
+                                    //string[] column1_values = dtTemp1.AsEnumerable().Select(s => s.Field<string>("City")).ToArray<string>(); //где dtTemp1 - экземпляр datatable
+                                    }
                                 }
                             }
                         }
@@ -171,46 +181,6 @@ namespace DATABASE
                 //Console.WriteLine($"Удалено объектов: {number}");
             }
             Console.Read();
-        }
-        public static void DataTable_Name()
-        {
-            List<string> tables = new List<string>();
-            using (SqliteConnection con = new SqliteConnection(CNCT))
-            {
-                con.Open();
-                try
-                {
-                    using (SqliteCommand com = new SqliteCommand("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES", con))
-                    {
-                        using (SqliteDataReader reader = com.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                tables.Add((string)reader["TABLE_NAME"]);
-                            }
-                        }
-                    }
-                }
-                catch (SqliteException)
-                {
-                    Console.WriteLine($"No such table exists");
-                }
-                return;
-            }
-        }
-        public override string ToString()
-        {
-            return base.ToString();
-        }
-
-        public override bool Equals(object obj)
-        {
-            return base.Equals(obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
         }
     }
 }
