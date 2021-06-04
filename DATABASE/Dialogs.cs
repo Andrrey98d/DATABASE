@@ -26,7 +26,22 @@ namespace DATABASE
         //}
         public static void ShowMenu()
         {
-            Console.WriteLine("1 - create new table\n2 - update table\n3 - insert values\n4 - delete row");
+            Program pr = new Program();
+            Console.WriteLine("1 - create new table\n2 - insert values\n3 - delete row");
+            int res = Convert.ToInt32(Console.ReadLine());
+            switch (res)
+            {
+                case 1:
+                    pr.Create_NewTable();
+                    break;
+                case 2:
+                    pr.INSERT_VALUES();
+                    break;
+                case 3:
+                    pr.DELETE();
+                    break;
+            }
         }
     }
 }
+// СПЕЦІАЛІСТ ЗА РАХУНОК ПОСАДИ ГОЛОВНОГО СПЕЦІАЛІСТА 55 ЦЕНТРУ 2 ДЕПАРТАМЕНТУ 2 УПРАВЛІННЯ 2 ВІДДІЛУ МОЛОДШИЙ ЛЕНТЕНАТ ДЕГТЯР АНДРІЙ
